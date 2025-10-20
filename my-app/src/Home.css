@@ -1,0 +1,54 @@
+.home-container {
+  display: flex;
+  height: 100vh;
+  background-color: #fafafa;
+}
+
+.sidebar {
+  width: 220px;
+  background: #fff;
+  border-right: 1px solid #ddd;
+  padding: 20px;
+}
+
+.sidebar h3 {
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.category-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.category-list li {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  transition: background 0.2s ease;
+}
+
+.category-list li:hover {
+  background: #f2f2f2;
+}
+
+.category-list li.active {
+  background: #007bff;
+  color: white;
+}
+
+.content-area {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.placeholder-text {
+  font-size: 16px;
+  color: #666;
+  text-align: center;
+  margin-top: 50px;
+}

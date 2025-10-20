@@ -1,0 +1,16 @@
+{
+  // Visit https://aka.ms/tsconfig to read more about this file
+  "compilerOptions": {
+    "sourceMap": true,
+    "outDir": "build",
+    "rootDir": "src",
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "target": "ES6",
+    "lib": [
+      "esnext"
+    ],
+    "esModuleInterop": true,
+    "module": "commonjs"
+  }
+}
