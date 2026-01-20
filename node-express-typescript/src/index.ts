@@ -2,6 +2,7 @@ import express from "express";
 import axios from "axios";
 import dotenv from "dotenv";
 import cors from "cors";
+import qs from "qs";
 
 dotenv.config();
 
@@ -11,20 +12,68 @@ app.use(cors({
   origin: "http://localhost:5173" // frontend origin
 }));
 
+// --- Token Management ---
+let cachedToken: string | null = null;
+let tokenExpirationTime: number = 0; // Timestamp in milliseconds
+
+async function getEbayAccessToken() {
+  const now = Date.now();
+
+  // Return cached token if it's still valid (with a 2-minute buffer)
+  if (cachedToken && now < tokenExpirationTime - 120000) {
+    return cachedToken;
+  }
+
+  console.log("Fetching new eBay Access Token...");
+
+  try {
+    // Basic Auth is base64(CLIENT_ID:CLIENT_SECRET)
+    const authHeader = Buffer.from(
+      `${process.env.EBAY_APP_ID}:${process.env.EBAY_CERT_ID}`
+    ).toString("base64");
+
+    const response = await axios.post(
+      "https://api.ebay.com/identity/v1/oauth2/token",
+      qs.stringify({
+        grant_type: "client_credentials",
+        scope: "https://api.ebay.com/oauth/api_scope" // Basic scope for search
+      }),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: `Basic ${authHeader}`,
+        },
+      }
+    );
+
+    const { access_token, expires_in } = response.data;
+    
+    cachedToken = access_token;
+    // expires_in is usually 7200 seconds (2 hours). Convert to ms and add to current time.
+    tokenExpirationTime = now + (expires_in * 1000);
+
+    return cachedToken;
+  } catch (error: any) {
+    console.error("Failed to refresh eBay token:", error.response?.data || error.message);
+    throw new Error("Could not authenticate with eBay");
+  }
+}
+// ------------------------
 app.get("/api/search", async (req, res) => {
   const query = (req.query.q as string) || "keyboard"; // default search/ASIN
   const limit = Number(req.query.limit) || 3;
 
   try {
-    // -----------------------------
-    // eBay API request
-    // -----------------------------
+    // 1. Get a valid token (either cached or fresh)
+    const accessToken = await getEbayAccessToken();
+
+    // 2. eBay API request using the dynamic token
     const ebayPromise = axios.get(
       "https://api.ebay.com/buy/browse/v1/item_summary/search",
       {
         params: { q: query, limit, offset: 0 },
         headers: {
-          Authorization: process.env.EBAY_API_KEY,
+          Authorization: `Bearer ${accessToken}`, // Use the variable, not the hardcoded string
           "X-EBAY-C-MARKETPLACE-ID": "EBAY_US",
         },
       }
