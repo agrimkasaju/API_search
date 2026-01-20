@@ -66,7 +66,7 @@ PORT=5000
 ```bash
 # Start backend
 cd backend
-npm run dev
+npm run start:dev
 
 # Start frontend (in another terminal)
 cd ../frontend
