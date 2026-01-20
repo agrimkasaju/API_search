@@ -65,11 +65,11 @@ PORT=5000
 
 ```bash
 # Start backend
-cd backend
+cd .\node-express-typescript\
 npm run start:dev
 
 # Start frontend (in another terminal)
-cd ../frontend
+cd .\my-app\
 npm run dev
 ```
 
