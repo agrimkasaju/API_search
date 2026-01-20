@@ -41,11 +41,11 @@ cd api-search
 
 ```bash
 # For backend
-cd backend
+cd .\node-express-typescript\
 npm install
 
 # For frontend
-cd ../frontend
+cd .\my-app\
 npm install
 ```
 
